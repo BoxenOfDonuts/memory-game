@@ -80,26 +80,10 @@ const GameBoard = (props) => {
 const Card = ({ imageURL, cardName }) => {
 
   return (
-    <div className="game-card">
-      <CardImage imageURL={imageURL} />
-      <CardDescription name={cardName} alt={cardName}/>
-    </div>
-  );
-}
-
-const CardImage = ({ imageURL, alt }) => {
-  return (
-    <div className="card-image">
-    <img src={imageURL} alt={alt}/>
-    </div>
-  );
-}
-
-const CardDescription = ({ name }) => {
-  return (
-    <div className="card-description">
-      {name}
-    </div>
+    <figure className='game-card'>
+      <img src={imageURL} alt={cardName}/>
+      <figcaption>{cardName}</figcaption>
+    </figure>
   );
 }
 
