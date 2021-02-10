@@ -1,49 +1,85 @@
-import { useEffect, useState } from 'react';
-// import { useHttp } from './components/hooks/http';
+import { useEffect, useRef, useState } from 'react';
+import { useHttp } from './components/hooks/http';
 import './App.css';
 import Header from './components/Header/Header'
 
-const data = {
-  data: [
-    {
-      "id": 75889523,
-      "name": "Archfiend Marmot of Nefariousness",
-      "card_images": [
-          {
-              "image_url_small": "https://storage.googleapis.com/ygoprodeck.com/pics_small/75889523.jpg"
-          }
-      ],
-    },
-    {
-      "id": 15150371,
-      "name": "Archfiend Mirror",
-      "card_images": [
-          {
-              "image_url_small": "https://storage.googleapis.com/ygoprodeck.com/pics_small/15150371.jpg"
-          }
-      ],
-    },
-    {
-      "id": 46009906,
-      "name": "Beast Fangs",
-      "card_images": [
-          {
-              "image_url_small": "https://storage.googleapis.com/ygoprodeck.com/pics_small/46009906.jpg"
-          }
-      ],
-    },
-  ]
+const shuffle = (array) => {
+  console.log('shufflin')
+  const newArray = [...array]
+  for (let i = newArray.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+  }
+  return newArray;
+}
+
+const randomStart = (totalLength, desiredLength) => {
+  const start = Math.floor(Math.random() * (totalLength - desiredLength))
+  const end  = start + desiredLength
+
+  return [start, end]
+}
+
+const cardsToScreenSize = () => {
+  const height = window.innerHeight;
+  // < 400 is 1 card
+  // < 565 is 2 cards
+  // < 255 is 3
 }
 
 const Board = (props) => {
-  // state here, scoreboard and the clicked item
   const [ score, setScore ] = useState(0);
   const [ highScore, setHighScore ] = useState(0);
+  const [ clickedCards, setClickedCards ] = useState([]);
+  const [ isNewGame, setIsNewGame ] = useState(false);
+  const numberOfCards = 18;
+  const prevClickedCards = useRef();
+
+  useEffect(() => {
+    prevClickedCards.current = clickedCards
+  });
+
+  useEffect(() => {
+    const resetAll = () => {
+      if (score > highScore) {
+        setHighScore(score)
+      }
+      setScore(0);
+      setClickedCards([]);
+      setIsNewGame(false);
+    }
+    if (!isNewGame) return;
+    console.log('is new game udpated')
+    resetAll();
+  }, [isNewGame])
+
+
+  const handleClick = (id) => {
+    console.log(`handle click ${prevClickedCards.current}`)
+    if (!prevClickedCards.current.includes(id)) {
+      setClickedCards(prevState => [...prevState, id])
+      setScore(prevScore => prevScore + 1)
+    } else {
+      console.log('you lose!')
+      setIsNewGame(true); 
+    }
+  };
+
+  const Thing = <button type='button' onClick={() => setIsNewGame(false)}>New Game?</button>
 
   return (
     <div className="board">
-      <ScoreBoard score={score} highScore={highScore}/>
-      <GameBoard />
+      <ScoreBoard
+        score={score}
+        highScore={highScore}
+      />
+      <GameBoard
+        onCardClick={handleClick}
+        isNewGame={isNewGame}
+        clickedCards={clickedCards}
+        numberOfCards={numberOfCards}
+      />
+      {/* {isNewGame && Thing} */}
     </div>
   );
 }
@@ -51,38 +87,55 @@ const Board = (props) => {
 const ScoreBoard = ({ score, highScore }) => {
   return (
     <div className="scoreboard">
-      <h3>Score: {score}</h3>
-      <div className="score-divider">|</div>
-      <h3> High Score: {highScore}</h3>
+      <h3>Score: {score} High Score: {highScore}</h3>
     </div>
   );
 }
 
-const GameBoard = (props) => {
-  // const image = data.data[0].card_images[0].image_url_small
-  // const name = data.data[0].name
+const GameBoard = ({ onCardClick, isNewGame, numberOfCards }) => {
+  const [ isLoading, fetchedData ] = useHttp(null, [isNewGame]);
+  const [ gameCards, setGameCards ] = useState(null)
 
-  const cards = data.data.map((card) => {
-    return <Card
-      key={card.id}
-      imageURL={card.card_images[0].image_url_small}
-      cardName={card.name}
-    />
-  })
+  console.log(`loading ${isLoading}`)
+
+  useEffect(() => {
+    console.log('mounting!')
+    if(fetchedData) {
+      const [ start, end ] = randomStart(fetchedData.data.length, numberOfCards);
+      setGameCards(fetchedData
+                      .data
+                      .slice(start,end)
+                      .map((card) => {
+                        return <Card
+                          key={card.id}
+                          imageURL={card.card_images[0].image_url_small}
+                          cardName={card.name}
+                          id={card.id}
+                          onCardClick={onCardClick}
+                        />
+                      }));
+      }
+  }, [isLoading])
+
+  let content =  <div>Loading...</div>;
+
+  if (!isLoading && !isNewGame && gameCards) {
+    content = shuffle(gameCards);
+  }
 
   return (
     <div className="game-board">
-      {cards}
+      {content}
     </div>
   );
 }
 
-const Card = ({ imageURL, cardName }) => {
+const Card = ({ imageURL, cardName, id, onCardClick }) => {
 
   return (
-    <figure className='game-card'>
+    <figure className='game-card' onClick={() => onCardClick(id)}>
       <img src={imageURL} alt={cardName}/>
-      <figcaption>{cardName}</figcaption>
+      {/* <figcaption>{cardName}</figcaption> */}
     </figure>
   );
 }
