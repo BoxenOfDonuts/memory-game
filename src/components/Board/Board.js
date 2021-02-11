@@ -4,7 +4,6 @@ import Card from '../Card/Card';
 import './Board.css'
 
 const shuffle = (array) => {
-  console.log('shufflin');
   const newArray = [...array];
   for (let i = newArray.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -17,11 +16,11 @@ const randomArray = (array, desiredLength) => {
   return shuffle(array).slice(0, desiredLength);
 };
 
-const Board = (props) => {
+const Board = () => {
   const [score, setScore] = useState(0);
   const [highScore, setHighScore] = useState(0);
   const [clickedCards, setClickedCards] = useState([]);
-  const [isNewGame, setIsNewGame] = useState(false);
+  const [newGameCount, setNewGameCount] = useState(0);
   const numberOfCards = 18;
   const prevClickedCards = useRef();
 
@@ -36,21 +35,17 @@ const Board = (props) => {
       }
       setScore(0);
       setClickedCards([]);
-      setIsNewGame(false);
     };
-    if (!isNewGame) return;
-    console.log('is new game udpated');
     resetAll();
-  }, [isNewGame]);
+  }, [newGameCount]);
 
   const handleClick = (id) => {
-    console.log(`handle click ${prevClickedCards.current}`);
     if (!prevClickedCards.current.includes(id)) {
       setClickedCards((prevState) => [...prevState, id]);
       setScore((prevScore) => prevScore + 1);
     } else {
       console.log('you lose!');
-      setIsNewGame(true);
+      setNewGameCount((prevState) => prevState + 1 );
     }
   };
 
@@ -59,7 +54,7 @@ const Board = (props) => {
       <ScoreBoard score={score} highScore={highScore} />
       <GameBoard
         onCardClick={handleClick}
-        isNewGame={isNewGame}
+        newGameCount={newGameCount}
         clickedCards={clickedCards}
         numberOfCards={numberOfCards}
       />
@@ -77,15 +72,15 @@ const ScoreBoard = ({ score, highScore }) => {
   );
 };
 
-const GameBoard = ({ onCardClick, isNewGame, numberOfCards }) => {
-  const [isLoading, fetchedData] = useHttp(null, [isNewGame]);
+const GameBoard = ({ onCardClick, newGameCount, numberOfCards }) => {
+  const [isLoading, fetchedData] = useHttp(null, []);
   const [gameCards, setGameCards] = useState(null);
 
-  console.log(`loading ${isLoading}`);
+
+  console.log(isLoading)
 
   useEffect(() => {
-    console.log('mounting!');
-    if (fetchedData) {
+    if (fetchedData && !isLoading) {
       const cards = randomArray(fetchedData.data, numberOfCards);
       setGameCards(
         cards.map((card) => {
@@ -100,12 +95,14 @@ const GameBoard = ({ onCardClick, isNewGame, numberOfCards }) => {
           );
         })
       );
+    } else if (isLoading){
+      setGameCards(null)
     }
-  }, [isLoading]);
+  }, [isLoading, newGameCount]);
 
   let content = <div className='loading'>Loading...</div>;
 
-  if (!isLoading && !isNewGame && gameCards) {
+  if (!isLoading && gameCards) {
     content = shuffle(gameCards);
   }
 

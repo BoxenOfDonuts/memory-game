@@ -1,13 +1,11 @@
 import { useEffect, useState } from 'react';
 
 export const useHttp = (url, dependencies) => {
-  // const [ isLoading, setIsLoading ] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [fetchData, setFetchedData] = useState(null);
 
   useEffect(() => {
     setIsLoading(true);
-
     fetch('https://db.ygoprodeck.com/api/v7/cardinfo.php?cardsetocg=Vol.1')
       .then((response) => {
         if (!response.ok) {
