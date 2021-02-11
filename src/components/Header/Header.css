@@ -1,6 +1,6 @@
 .header {
-    background-color: var(--nav-bg-color);
-    text-align: center;
-    color: white;
-    padding-bottom: 8px;
-  }
+  background-color: var(--nav-bg-color);
+  text-align: center;
+  color: white;
+  padding-bottom: 8px;
+}

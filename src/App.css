@@ -1,75 +1,19 @@
 :root {
-  --bg-color:#607D8B;
+  --bg-color: #607d8b;
   --main-bg-color: #282c34;
-  --resume-bg-color: #CFD8DC;
+  --resume-bg-color: #cfd8dc;
   --nav-bg-color: #455a64;
-  --button-color: #7C4DFF;
+  --button-color: #7c4dff;
   --button-active-color: #412c7d;
 }
 
 * {
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
 }
 
-.card-description {
-  /* color:white; */
-  text-align: center;
-}
-
-.game-board {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-around;
-  margin: 0 20px;
-}
-
-.game-card {
-  display: flex;
-  flex-direction: column;
-  /* border: 2px solid white; */
-  justify-content: center;
-  align-items: center;
-  /* width: 250px; */
-  margin: 10px;
-  /* padding: 10px; */
-  background-color: white;
-  text-align: center;
-
-}
-
-.card-image {
-  margin: 0 auto;
-}
-
-figcaption {
-  height: 50px;
-}
-
-img {
-  max-width: 100%;  
-}
-
-.board {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.scoreboard {
-  text-align: center;
-  display: flex;
-  color:white;
-  width:max-content;
-  margin: 20px 0;
-  /* margin:auto */
-}
-
-.score-divider {
-  font-weight: 900;
-}
-
-.main-app {
+html,
+body {
   background-color: var(--main-bg-color);
-  height: 100vh;
 }
