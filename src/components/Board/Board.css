@@ -25,3 +25,8 @@
   width: max-content;
   margin: 20px 0;
 }
+
+.loading {
+  color: white;
+  font-size: 5rem;
+}

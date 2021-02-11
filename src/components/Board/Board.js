@@ -103,7 +103,7 @@ const GameBoard = ({ onCardClick, isNewGame, numberOfCards }) => {
     }
   }, [isLoading]);
 
-  let content = <div className={'loading'}>Loading...</div>;
+  let content = <div className='loading'>Loading...</div>;
 
   if (!isLoading && !isNewGame && gameCards) {
     content = shuffle(gameCards);
