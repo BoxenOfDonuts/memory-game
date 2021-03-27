@@ -1,7 +1,11 @@
 import React from 'react';
 import './Header.css';
 
-const Header = (props) => {
+interface Props {
+  title: string;
+}
+
+const Header: React.FC<Props> = (props) => {
   return (
     <div className="header">
       <h1>{props.title}</h1>

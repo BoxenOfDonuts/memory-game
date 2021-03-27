@@ -1,9 +1,21 @@
-import { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useHttp } from '../hooks/http';
 import Card from '../Card/Card';
 import './Board.css'
 
-const shuffle = (array) => {
+type Cards = Readonly<any[]>
+
+interface scoreBoardProps {
+  score: number;
+  highScore: Number
+}
+interface gameBoardProps {
+  onCardClick: (id: number) => void
+  newGameCount: number;
+  numberOfCards: number
+}
+
+const shuffle = (array: Cards) => {
   const newArray = [...array];
   for (let i = newArray.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -12,17 +24,17 @@ const shuffle = (array) => {
   return newArray;
 };
 
-const randomArray = (array, desiredLength) => {
+const randomArray = (array: Cards, desiredLength: number) => {
   return shuffle(array).slice(0, desiredLength);
 };
 
 const Board = () => {
-  const [score, setScore] = useState(0);
-  const [highScore, setHighScore] = useState(0);
-  const [clickedCards, setClickedCards] = useState([]);
-  const [newGameCount, setNewGameCount] = useState(0);
-  const numberOfCards = 18;
-  const prevClickedCards = useRef();
+  const [score, setScore] = useState<number>(0);
+  const [highScore, setHighScore] = useState<number>(0);
+  const [clickedCards, setClickedCards] = useState<Cards>([]);
+  const [newGameCount, setNewGameCount] = useState<number>(0);
+  const numberOfCards: number = 18;
+  const prevClickedCards = useRef(clickedCards);
 
   useEffect(() => {
     prevClickedCards.current = clickedCards;
@@ -39,7 +51,7 @@ const Board = () => {
     resetAll();
   }, [newGameCount]);
 
-  const handleClick = (id) => {
+  const handleClick = (id: number) => {
     if (!prevClickedCards.current.includes(id)) {
       setClickedCards((prevState) => [...prevState, id]);
       setScore((prevScore) => prevScore + 1);
@@ -51,18 +63,20 @@ const Board = () => {
 
   return (
     <div className="board">
-      <ScoreBoard score={score} highScore={highScore} />
+      <ScoreBoard
+        score={score}
+        highScore={highScore}
+      />
       <GameBoard
         onCardClick={handleClick}
         newGameCount={newGameCount}
-        clickedCards={clickedCards}
         numberOfCards={numberOfCards}
       />
     </div>
   );
 };
 
-const ScoreBoard = ({ score, highScore }) => {
+const ScoreBoard: React.FC<scoreBoardProps> = ({ score, highScore }) => {
   return (
     <div className="scoreboard">
       <h3>
@@ -72,12 +86,9 @@ const ScoreBoard = ({ score, highScore }) => {
   );
 };
 
-const GameBoard = ({ onCardClick, newGameCount, numberOfCards }) => {
-  const [isLoading, fetchedData] = useHttp(null, []);
-  const [gameCards, setGameCards] = useState(null);
-
-
-  console.log(isLoading)
+const GameBoard: React.FC<gameBoardProps> = ({ onCardClick, newGameCount, numberOfCards }) => {
+  const [isLoading, fetchedData] = useHttp('https://db.ygoprodeck.com/api/v7/cardinfo.php?cardsetocg=Vol.1', []);
+  const [gameCards, setGameCards] = useState<null|JSX.Element[]>(null);
 
   useEffect(() => {
     if (fetchedData && !isLoading) {
@@ -100,7 +111,7 @@ const GameBoard = ({ onCardClick, newGameCount, numberOfCards }) => {
     }
   }, [isLoading, newGameCount]);
 
-  let content = <div className='loading'>Loading...</div>;
+  let content: JSX.Element|JSX.Element[] = <div className='loading'>Loading...</div>;
 
   if (!isLoading && gameCards) {
     content = shuffle(gameCards);

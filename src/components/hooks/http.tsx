@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 
-export const useHttp = (url, dependencies) => {
-  const [isLoading, setIsLoading] = useState(false);
+
+export const useHttp= (url: string, dependencies: []): [boolean, null | {data: any[]}] => {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [fetchData, setFetchedData] = useState(null);
 
   useEffect(() => {
     setIsLoading(true);
-    fetch('https://db.ygoprodeck.com/api/v7/cardinfo.php?cardsetocg=Vol.1')
+    fetch(url)
       .then((response) => {
         if (!response.ok) {
           throw new Error('Failed to fetch.');
